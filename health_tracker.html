@@ -1,0 +1,535 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Health Tracker</title>
+  <!-- Mobile App Features -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Health Tracker">
+  <meta name="theme-color" content="#2563eb">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      margin: 0;
+      padding: 12px;
+      color: #1e293b;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      color: #0f172a;
+      font-size: 1.4rem;
+    }
+
+    /* Mobile Navigation Bar */
+    .tab-navigation {
+      display: flex;
+      gap: 4px;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 16px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .tab-btn {
+      padding: 10px 12px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #64748b;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .tab-btn.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block !important;
+    }
+
+    /* Form Fields */
+    .form-section {
+      background: #f8fafc;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+    }
+
+    .form-section h3 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.05rem;
+      color: #334155;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 10px;
+    }
+
+    .field-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #475569;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="datetime-local"],
+    input[type="date"],
+    select,
+    textarea {
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 1rem;
+      width: 100%;
+      background-color: #ffffff;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    /* Action Buttons */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .submit-btn:active {
+      background-color: #1d4ed8;
+    }
+
+    .secondary-btn {
+      background-color: #e2e8f0;
+      color: #334155;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .danger-btn {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .pain-entry-row {
+      display: grid;
+      grid-template-columns: 1.2fr 1.2fr 1fr auto;
+      gap: 8px;
+      align-items: flex-end;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .pain-entry-row {
+        grid-template-columns: 1fr;
+        border-bottom: 1px dashed #cbd5e1;
+        padding-bottom: 10px;
+      }
+    }
+
+    .remove-btn {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    /* Log Output Styling */
+    .filter-controls {
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 14px;
+    }
+
+    .log-card {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-left: 5px solid #64748b;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .log-card.log-type-vitals { border-left-color: #2563eb; }
+    .log-card.log-type-pain { border-left-color: #ef4444; }
+    .log-card.log-type-ostomy { border-left-color: #10b981; }
+
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .badge-vitals { background-color: #dbeafe; color: #1e40af; }
+    .badge-pain { background-color: #fee2e2; color: #991b1b; }
+    .badge-ostomy { background-color: #d1fae5; color: #065f46; }
+
+    .log-time {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .log-body {
+      font-size: 0.95rem;
+      color: #1e293b;
+      line-height: 1.4;
+    }
+
+    .log-notes {
+      margin-top: 6px;
+      padding-top: 6px;
+      border-top: 1px dashed #e2e8f0;
+      font-size: 0.85rem;
+      color: #475569;
+      font-style: italic;
+    }
+
+    .log-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 8px;
+    }
+
+    .delete-item-btn {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 0;
+      text-decoration: underline;
+    }
+
+    .empty-msg {
+      color: #64748b;
+      font-style: italic;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .data-management {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+ </head>
+ <body>
+  <div class="container">
+   <h2>Health Tracker</h2>
+   <!-- Navigation Bar -->
+   <div class="tab-navigation">
+    <button class="tab-btn active" data-target="vitals-tab">Vitals</button>
+    <button class="tab-btn" data-target="pain-tab">Pain Log</button>
+    <button class="tab-btn" data-target="ostomy-tab">Ostomy Care</button>
+    <button class="tab-btn" data-target="logs-tab">History &amp; Logs</button>
+   </div>
+   <!-- TAB 1: Vital Signs -->
+   <div id="vitals-tab" class="tab-content active">
+    <form id="vitals-form">
+     <div class="form-section">
+      <h3>Vital Signs</h3>
+      <div class="grid-2">
+       <div class="field-group">
+        <label for="bp">Blood Pressure (mmHg)</label> <input type="text" id="bp" placeholder="120/80">
+       </div>
+       <div class="field-group">
+        <label for="pulse">Heart Rate / Pulse (BPM)</label> <input type="number" id="pulse" placeholder="72">
+       </div>
+       <div class="field-group">
+        <label for="temp">Temperature (°F)</label> <input type="number" step="0.1" id="temp" placeholder="98.6">
+       </div>
+       <div class="field-group">
+        <label for="spo2">Oxygen Saturation (SpO2 %)</label> <input type="number" id="spo2" placeholder="98">
+       </div>
+       <div class="field-group">
+        <label for="weight">Weight (lbs)</label> <input type="number" step="0.1" id="weight" placeholder="150.0">
+       </div>
+      </div>
+     </div>
+     <div class="form-section">
+      <h3>Vitals Notes</h3>
+      <div class="field-group">
+       <textarea id="vitals-notes" rows="3" placeholder="Enter any notes about today's vitals..."></textarea>
+      </div>
+     </div>
+     <button type="submit" class="submit-btn">Save Vitals Entry</button>
+    </form>
+   </div>
+   <!-- TAB 2: Pain Log -->
+   <div id="pain-tab" class="tab-content">
+    <form id="pain-form">
+     <div class="form-section pain-tracker-section">
+      <h3>Pain Details</h3>
+      <div id="pain-entries-container">
+       <div class="pain-entry-row">
+        <div class="field-group">
+         <label>Pain Location</label> <select class="pain-location-select"> <option value="" disabled selected>Select Location</option> <option value="Head / Neck">Head / Neck</option> <option value="Upper Back">Upper Back</option> <option value="Lower Back">Lower Back</option> <option value="Chest">Chest</option> <option value="Abdomen">Abdomen</option> <option value="Left Shoulder">Left Shoulder</option> <option value="Right Shoulder">Right Shoulder</option> <option value="Left Arm / Hand">Left Arm / Hand</option> <option value="Right Arm / Hand">Right Arm / Hand</option> <option value="Left Hip / Leg">Left Hip / Leg</option> <option value="Right Hip / Leg">Right Hip / Leg</option> </select>
+        </div>
+        <div class="field-group">
+         <label>Type of Pain</label> <select class="pain-type-select"> <option value="" disabled selected>Select Type</option> <option value="Sharp / Stabbing">Sharp / Stabbing</option> <option value="Dull / Aching">Dull / Aching</option> <option value="Throbbing / Pulsing">Throbbing / Pulsing</option> <option value="Burning / Stinging">Burning / Stinging</option> <option value="Shooting / Radiating">Shooting / Radiating</option> <option value="Stiff / Tight">Stiff / Tight</option> <option value="Cramping">Cramping</option> </select>
+        </div>
+        <div class="field-group">
+         <label>Severity (1-10)</label> <select class="pain-severity-select"> <option value="" disabled selected>Scale 1-10</option> <option value="1">1 - Mild / Barely Noticeable</option> <option value="2">2 - Minor Pain</option> <option value="3">3 - Noticeable / Tolerable</option> <option value="4">4 - Moderate Pain</option> <option value="5">5 - Moderately Severe</option> <option value="6">6 - Distracting / Discomforting</option> <option value="7">7 - Severe Pain</option> <option value="8">8 - Intense / Very Severe</option> <option value="9">9 - Excruciating / Unbearable</option> <option value="10">10 - Worst Pain Possible</option> </select>
+        </div>
+        <button type="button" class="remove-btn">Remove</button>
+       </div>
+      </div>
+      <button type="button" id="add-pain-btn" class="secondary-btn">+ Add Location</button>
+     </div>
+     <div class="form-section">
+      <h3>Pain Notes</h3>
+      <div class="field-group">
+       <textarea id="pain-notes" rows="3" placeholder="Additional details on pain triggers or relief measures..."></textarea>
+      </div>
+     </div>
+     <button type="submit" class="submit-btn">Save Pain Entry</button>
+    </form>
+   </div>
+   <!-- TAB 3: Ostomy Care -->
+   <div id="ostomy-tab" class="tab-content">
+    <form id="ostomy-form">
+     <div class="form-section">
+      <h3>Ostomy Log</h3>
+      <div class="grid-2">
+       <div class="field-group">
+        <label for="ostomy-date">Last Date / Time Changed</label> <input type="datetime-local" id="ostomy-date">
+       </div>
+       <div class="field-group">
+        <label for="stool-consistency">Consistency of Stool</label> <select id="stool-consistency"> <option value="" disabled selected>Select Consistency...</option> <option value="Liquid / Watery">Liquid / Watery</option> <option value="Soft / Paste">Soft / Paste</option> <option value="Formed / Semi-Solid">Formed / Semi-Solid</option> <option value="Thick / Hard">Thick / Hard</option> </select>
+       </div>
+       <div class="field-group">
+        <label for="bile-presence">Presence of Bile</label> <select id="bile-presence"> <option value="" disabled selected>Select Bile Status...</option> <option value="None / Normal Color">None / Normal Color</option> <option value="Slight Trace">Slight Trace</option> <option value="Moderate / Dark Green">Moderate / Dark Green</option> <option value="Heavy / Bright Yellow">Heavy / Bright Yellow</option> </select>
+       </div>
+       <div class="field-group">
+        <label for="powders-taken">Number of Powders Taken</label> <input type="number" id="powders-taken" min="0" placeholder="0">
+       </div>
+      </div>
+      <div class="field-group" style="margin-top: 12px;">
+       <label for="ostomy-notes">Ostomy Notes / Observations</label> <textarea id="ostomy-notes" rows="3" placeholder="Skin condition around stoma, leak notes, pouch changes..."></textarea>
+      </div>
+     </div>
+     <button type="submit" class="submit-btn">Save Ostomy Log</button>
+    </form>
+   </div>
+   <!-- TAB 4: History & Logs -->
+   <div id="logs-tab" class="tab-content">
+    <div class="form-section">
+     <h3>Saved History</h3>
+     <div class="grid-2 filter-controls">
+      <div class="field-group">
+       <label for="filter-type">Filter by Entry Type</label> <select id="filter-type"> <option value="all">All Types</option> <option value="Vitals">Vitals</option> <option value="Pain">Pain</option> <option value="Ostomy">Ostomy</option> </select>
+      </div>
+      <div class="field-group">
+       <label for="sort-date">Sort Order</label> <select id="sort-date"> <option value="newest">Newest First</option> <option value="oldest">Oldest First</option> </select>
+      </div>
+     </div>
+     <div id="logs-container"></div>
+     <div class="data-management">
+      <button id="clear-all-btn" class="danger-btn">Clear All Saved History</button>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    // Load logs permanently from phone memory (localStorage)
+    var healthLogs = JSON.parse(localStorage.getItem('myHealthTrackerLogs')) || [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+      // Set default datetime to right now for Ostomy form
+      var dateInput = document.getElementById('ostomy-date');
+      if (dateInput) {
+        var now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        dateInput.value = now.toISOString().slice(0,16);
+      }
+
+      // Tab Switcher
+      var mainTabBtns = document.querySelectorAll('.tab-navigation .tab-btn');
+      mainTabBtns.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var targetId = this.getAttribute('data-target');
+
+          document.querySelectorAll('.container > .tab-content').forEach(function(content) {
+            content.classList.remove('active');
+            content.style.display = 'none';
+          });
+
+          mainTabBtns.forEach(function(b) {
+            b.classList.remove('active');
+          });
+
+          this.classList.add('active');
+          var activePanel = document.getElementById(targetId);
+          if (activePanel) {
+            activePanel.classList.add('active');
+            activePanel.style.display = 'block';
+          }
+        });
+      });
+
+      // Add Pain Entry Row
+      var addPainBtn = document.getElementById('add-pain-btn');
+      if (addPainBtn) {
+        addPainBtn.addEventListener('click', function() {
+          var container = document.getElementById('pain-entries-container');
+          var firstEntry = container.querySelector('.pain-entry-row');
+          if (firstEntry) {
+            var newEntry = firstEntry.cloneNode(true);
+            newEntry.querySelectorAll('select').forEach(function(s) { s.selectedIndex = 0; });
+            container.appendChild(newEntry);
+          }
+        });
+      }
+
+      // Remove Pain Row
+      document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('remove-btn')) {
+          var container = document.getElementById('pain-entries-container');
+          var rows = container.querySelectorAll('.pain-entry-row');
+          if (rows.length > 1) {
+            e.target.closest('.pain-entry-row').remove();
+          } else {
+            rows[0].querySelectorAll('select').forEach(function(s) { s.selectedIndex = 0; });
+          }
+        }
+      });
+
+      // Render Logs from phone storage
+      function renderHistoryLogs() {
+        var container = document.getElementById('logs-container');
+        var filterType = document.getElementById('filter-type').value;
+        var sortDate = document.getElementById('sort-date').value;
+
+        if (!container) return;
+
+        var filtered = healthLogs.filter(function(log) {
+          return filterType === 'all' || log.type === filterType;
+        });
+
+        filtered.sort(function(a, b) {
+          return sortDate === 'newest' ? new Date(b.timestamp) - new Date(a.timestamp) : new Date(a.timestamp) - new Date(b.timestamp);
+        });
+
+        if (filtered.length === 0) {
+          container.innerHTML = '<p class="empty-msg">No saved entries found.</p>';
+          return;
+        }
+
+        var html = '';
+        filtered.forEach(function(log) {
+          html += '<div class="log-card log-type-' + log.type.toLowerCase() + '">' +
+            '<div class="log-header">' +
+              '<span class="badge badge-' + log.type.toLowerCase() + '">' + log.type + '</span>' +
+              '<span class="log-time">' + new Date(log.timestamp).toLocaleString() + '</span>' +
+            '</div>' +
+            '<div class="log-body">' + log.details + '</div>' +
+            (log.notes ? '<div class="log-notes"><strong>Notes:</strong> ' + log.notes + '</div>' : '') +
+            '<div class="log-actions">' +
+              '<button class="delete-item-btn" onclick="deleteSingleLog(' + log.id + ')">Delete Entry</button>' +
+            '</div>' +
+          '</div>';
+        });
+
+        container.innerHTML = html;
+      }
+
+      document.getElementById('filter-type').addEventListener('change', renderHistoryLogs);
+      document.getElementById('sort-date').addEventListener('change', renderHistoryLogs);
+
+      // Save entry function
+      function saveLogEntry(log) {
+        healthLogs.push(log);
+        localStorage.setItem('myHealthTrackerLogs', JSON.stringify(healthLogs));
+        renderHistoryLogs();
+      }
+
+      // Global delete functions
+      window.deleteSingleLog = function(id) {
+        if (confirm('Delete this entry?')) {
+          healthLogs = healthLogs.filter(function(item) { return item.id !== id; });
+          localStorage.setItem('myHealthTrackerLogs', JSON.stringify(healthLogs));
+          rend</script>
+ </body>
+</html>
